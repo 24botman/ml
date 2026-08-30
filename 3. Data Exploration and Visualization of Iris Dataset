@@ -1,0 +1,29 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load Iris dataset
+df = sns.load_dataset("iris")
+
+print("First 5 rows:")
+print(df.head())
+
+print("\nDataset Information:")
+print(df.info())
+
+print("\nStatistical Summary:")
+print(df.describe())
+
+print("\nSpecies Count:")
+print(df["species"].value_counts())
+
+# Scatter plot
+sns.scatterplot(
+    data=df,
+    x="sepal_length",
+    y="petal_length",
+    hue="species"
+)
+
+plt.title("Iris Dataset Visualization")
+plt.show()
