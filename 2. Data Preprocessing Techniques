@@ -1,0 +1,29 @@
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+# Sample dataset
+data = {
+    "Age": [20, 21, None, 23, 22],
+    "Gender": ["Male", "Female", "Male", "Female", "Male"],
+    "Marks": [80, 90, 75, None, 85]
+}
+
+df = pd.DataFrame(data)
+
+print("Original Data:")
+print(df)
+
+# Handle missing values
+df["Age"] = df["Age"].fillna(df["Age"].mean())
+df["Marks"] = df["Marks"].fillna(df["Marks"].mean())
+
+# Encode categorical data
+le = LabelEncoder()
+df["Gender"] = le.fit_transform(df["Gender"])
+
+# Feature scaling
+scaler = StandardScaler()
+df[["Age", "Marks"]] = scaler.fit_transform(df[["Age", "Marks"]])
+
+print("\nPreprocessed Data:")
+print(df)
