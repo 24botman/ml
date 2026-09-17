@@ -1,29 +1,30 @@
+program3
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-
-# Load Iris dataset
-df = sns.load_dataset("iris")
-
-print("First 5 rows:")
-print(df.head())
-
-print("\nDataset Information:")
-print(df.info())
-
-print("\nStatistical Summary:")
-print(df.describe())
-
-print("\nSpecies Count:")
-print(df["species"].value_counts())
-
-# Scatter plot
-sns.scatterplot(
-    data=df,
-    x="sepal_length",
-    y="petal_length",
-    hue="species"
+from sklearn import datasets
+# Load the Iris dataset
+iris = datasets.load_iris()
+df = pd.DataFrame(data=iris.data, columns=iris.feature_names)
+df['species'] = iris.target
+df['species'] = df['species'].map(
+ {i: name for i, name in enumerate(iris.target_names)}
 )
-
-plt.title("Iris Dataset Visualization")
+# Basic data exploration
+print("First 5 rows of the dataset:")
+print(df.head())
+print("\nDataset Info:")
+df.info()
+print("\nSummary Statistics:")
+print(df.describe())
+print("\nClass Distribution:")
+print(df['species'].value_counts())
+# Pairplot for feature relationships
+sns.pairplot(df, hue='species', palette='Set2')
+plt.suptitle('Pairplot of Iris Features', y=1.02)
+plt.show()
+# Boxplot for feature distribution
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df[iris.feature_names], orient='h', palette='Set3')
+plt.title('Boxplot of Iris Features')
 plt.show()
