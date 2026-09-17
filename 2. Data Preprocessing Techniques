@@ -1,29 +1,68 @@
+program2
+
 import pandas as pd
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-
-# Sample dataset
+import numpy as np
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 data = {
-    "Age": [20, 21, None, 23, 22],
-    "Gender": ["Male", "Female", "Male", "Female", "Male"],
-    "Marks": [80, 90, 75, None, 85]
+ 'Age': [25, 30, np.nan, 45, 22, 38, 50, np.nan],
+ 'Salary': [50000, 60000, 75000, np.nan, 48000, 80000, 90000, 65000],
+ 'Gender': ['Male', 'Female', 'Male', 'Female', 'Male', 'Female', 'Male', 'Female'],
+ 'city': ['New York', 'London', 'Paris', 'New York', 'London', 'Paris', 'New York', 'London'],
+ 'Purchased': ['no', 'yes', 'no', 'yes', 'no', 'yes', 'no', 'yes']
 }
-
 df = pd.DataFrame(data)
-
-print("Original Data:")
+print("Original DataFrame:")
 print(df)
-
-# Handle missing values
-df["Age"] = df["Age"].fillna(df["Age"].mean())
-df["Marks"] = df["Marks"].fillna(df["Marks"].mean())
-
-# Encode categorical data
-le = LabelEncoder()
-df["Gender"] = le.fit_transform(df["Gender"])
-
-# Feature scaling
+# Separate features and target
+X = df.drop('Purchased', axis=1)
+y = df['Purchased']
+numerical_features = ['Age', 'Salary']
+categorical_features = ['Gender', 'city']
+# Impute missing values
+numeric_imputer = SimpleImputer(strategy='mean')
+categorical_imputer = SimpleImputer(strategy='most_frequent')
+imputation_preprocessor = ColumnTransformer(
+ transformers=[
+ ('num', numeric_imputer, numerical_features),
+ ('cat', categorical_imputer, categorical_features)
+ ],
+ remainder='drop'
+)
+X_imputed = imputation_preprocessor.fit_transform(X)
+X_imputed = pd.DataFrame(
+ X_imputed,
+ columns=numerical_features + categorical_features,
+ index=X.index
+)
+print("\nDataFrame after imputation:")
+print(X_imputed)
+# One-hot encode categorical columns
+encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
+encoding_preprocessor = ColumnTransformer(
+ transformers=[
+ ('cat', encoder, categorical_features),
+ ('num', 'passthrough', numerical_features)
+ ],
+ remainder='drop'
+)
+X_encoded_array = encoding_preprocessor.fit_transform(X_imputed)
+encoded_feature_names = encoding_preprocessor.get_feature_names_out()
+X_encoded = pd.DataFrame(
+ X_encoded_array,
+ columns=encoded_feature_names,
+ index=X.index
+)
+print("\nDataFrame after one-hot encoding:")
+print(X_encoded)
+# Standardize numerical columns
 scaler = StandardScaler()
-df[["Age", "Marks"]] = scaler.fit_transform(df[["Age", "Marks"]])
-
-print("\nPreprocessed Data:")
-print(df)
+numeric_encoded_names = [f'num__{col}' for col in numerical_features]
+X_encoded[numeric_encoded_names] = 
+scaler.fit_transform(X_encoded[numeric_encoded_names])
+df_scaled = X_encoded.copy()
+df_scaled['Purchased'] = y.values
+print("\nDataFrame after scaling:")
+print(df_scaled)
